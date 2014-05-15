@@ -56,15 +56,12 @@ def BcryptMixin(rounds=10):
 
     return inner
 
-class User(models.Model, BcryptMixin()):
-  name = models.CharField(max_length=64)
-  username = models.CharField(max_length=254, blank=True, default="")
-  email = models.EmailField(unique=True, null=True, default=None)
-  biography = models.TextField(blank=True)
-  version = models.IntegerField(default=2, null=False, blank=False)
-  first_login = models.BooleanField(default=True)
-  first_login_datetime = models.DateTimeField(default=timezone.make_aware(datetime.utcfromtimestamp(0), utc))
-  last_login = models.DateTimeField(default=timezone.make_aware(datetime.utcfromtimestamp(0), utc))
-  linkedin_token = models.CharField(max_length=256, blank=True, default="")
-
-
+class User(BcryptMixin()):
+  linked_in_token = models.CharField(max_length=254, blank=True)
+  google_email = models.CharField(max_length=500, blank=True)
+  google_photo = models.CharField(max_length=300, blank=True)
+  google_username = models.CharField(max_length=100, blank=True)
+  first_name = models.CharField(max_length=100)
+  last_name = models.CharField(max_length=100)
+  google_email = models.CharField(max_length=100)
+  #google_authorization_token = models.CharField(max_length=100)

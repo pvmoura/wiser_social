@@ -1,4 +1,7 @@
 # Django settings for social_integrations project.
+import os
+import social
+import utils
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -6,13 +9,15 @@ TEMPLATE_DEBUG = DEBUG
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
+LINKEDIN_CONNECTIONS = False
 
 MANAGERS = ADMINS
 
+PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'delve_social',                      # Or path to database file if using sqlite3.
+        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': os.path.join(PROJECT_DIR, 'db'),                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
         'USER': 'postgres',
         'PASSWORD': 'delve',
@@ -20,6 +25,19 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default.
     }
 }
+
+SOCIAL_AUTH_LINKEDIN_OAUTH2_KEY = '77kwxx1c4mp6a4'
+SOCIAL_AUTH_LINKEDIN_OAUTH2_SECRET = 'XHoekjVjCJHVqFTF'
+SOCIAL_AUTH_LINKEDIN_OAUTH2_SCOPE = ['r_basicprofile', 'r_emailaddress', 'r_fullprofile']
+if LINKEDIN_CONNECTIONS:
+    SOCIAL_AUTH_LINKEDIN_OAUTH2_SCOPE.append('r_network')
+
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'gCX7-9PrHVibnsbMIHspu6tL'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '951950866577-jbukrvsoop705u3caafaho7ujvkip474'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['https://www.google.com/m8/feeds']
+
+LOGIN_URL = '/login/'
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -98,6 +116,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'social_integrations.middleware.SocialAuthExceptionMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
@@ -108,6 +127,7 @@ ROOT_URLCONF = 'social_integrations.urls'
 WSGI_APPLICATION = 'social_integrations.wsgi.application'
 
 TEMPLATE_DIRS = (
+    os.path.join(PROJECT_DIR, 'Templates'),
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -122,8 +142,35 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
+    'social.apps.django_app.default',
+    'social_integrations'
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+)
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'social.backends.linkedin.LinkedinOAuth',
+    'social.backends.linkedin.LinkedinOAuth2',
+    'social.backends.google.GoogleOpenId',
+    'social.backends.google.GoogleOAuth2',
+)
+
+SOCIAL_AUTH_PIPELINE = (
+    'social.pipeline.social_auth.social_details',
+    'social.pipeline.social_auth.social_uid',
+    'social.pipeline.social_auth.auth_allowed',
+    'social.pipeline.social_auth.social_user',
+    'social.pipeline.user.get_username',
+    'social.pipeline.user.create_user',
+    'social.pipeline.social_auth.associate_user',
+    'social.pipeline.social_auth.load_extra_data',
+    'social.pipeline.user.user_details'
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'social.apps.django_app.context_processors.backends',
+    'social.apps.django_app.context_processors.login_redirect'
 )
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
