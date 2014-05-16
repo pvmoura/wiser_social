@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}LinkedIn Profile Information{% endblock %}
+{% block content %}
+  {% for key, val in response.items %}
+  <div>
+    {{key}}
+  </div>
+  <div>
+    {{val}}
+  </div>
+  {% endfor %}
+{% endblock %}
