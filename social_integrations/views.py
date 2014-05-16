@@ -25,9 +25,10 @@ def google_contact_info(request):
 
   if not request.user.is_authenticated():
     return redirect('/')
-  token_obj = request.user.social_auth.get(provider='google-oauth2')
-  if not token_obj:
-    return redirect('/')
+  try:
+    token_obj = request.user.social_auth.get(provider='google-oauth2')
+  except:
+    return HttpResponse('hello')
   
   token = token_obj.extra_data['access_token']
   domain = get_domain(token_obj.uid)
