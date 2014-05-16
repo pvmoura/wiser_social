@@ -45,6 +45,7 @@ there.
   * [Google Contacts API docs](https://developers.google.com/google-apps/contacts/v3/#retrieving_all_contacts)
     * Note: to get all of a user's contacts, set the query param 'max-results' to a large number (I set it to 50000)
 
-## Usage notes
+## Notes
+In middleware.py I added a handler for the AuthCanceled exception Python-Social-Auth throws in case of a 401 during authentication. [Here](http://psa.matiasaguirre.net/docs/exceptions.html) is a list of the exceptions Python-Social-Auth can throw.
 
 

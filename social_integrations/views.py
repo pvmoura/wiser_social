@@ -35,6 +35,7 @@ def google_contact_info(request):
   if not request.user.is_authenticated():
     return redirect('/')
 
+  # get access token from database, if it exists
   try:
     token_obj = request.user.social_auth.get(provider='google-oauth2')
   except:
@@ -43,6 +44,7 @@ def google_contact_info(request):
   token = token_obj.extra_data['access_token']
   domain = get_domain(token_obj.uid)
 
+  # query the api with the following params
   url = GOOGLE_API_URL
   params = {
     'access_token': token,
@@ -55,9 +57,12 @@ def google_contact_info(request):
     redirect('/')
   else:
     response = json.loads(r.text)
+    # uncomment below lines to see raw contact response data
     #response = '<br />'.join([str(key) + ' and ' + str(val) for entry in response['feed']['entry'] for key, val in entry.iteritems()])
     #return HttpResponse(response)
     output = {'access_token': token, 'entries': []}
+
+    # clean up raw data, getting only contact images, emails, and names
     for entry in response['feed']['entry']:
       emails, images, title = [], [], ""
       for key, val in entry.iteritems():
@@ -78,18 +83,20 @@ def google_contact_info(request):
 
     return render_to_response('contacts.html', {'output': output})
 
-
+# You can add as many profile fields as you want: https://developers.linkedin.com/documents/profile-fields
 LINKEDIN_PROFILE_FIELDS = ('skills', 'first-name', 'last-name', 'positions')
 LINKEDIN_COMPANY_FIELDS = ('size', 'name', 'type', 'industry')
 LINKEDIN_COMPANY_URL = 'https://api.linkedin.com/v1/companies/{0}'
 LINKEDIN_PROFILE_URL = 'https://api.linkedin.com/v1/people/~'
 
 def get_linkedin_request_resources(base, token, additions=None, format='json'):
+  """ a function to create the LinkedIn API url and the necessary params """
   if additions:
     base += ':(' + ','.join(additions) + ')'
   return base, {'oauth2_access_token': token, 'format': format}
 
-def linkedin_profile_info (request):
+def linkedin_profile_info(request):
+  """ query LinkedIn API and return raw json data """
   if request.user.is_authenticated():
     try:
       token_obj = request.user.social_auth.get(provider='linkedin-oauth2')
@@ -100,8 +107,12 @@ def linkedin_profile_info (request):
       LINKEDIN_PROFILE_URL, token, LINKEDIN_PROFILE_FIELDS
     )
     r = requests.get(url, params=params)
-
-    response_dict = json.loads(r.text)
-    return render_to_response('linkedin_profile.html', {'response': response_dict})
-
+    if r.status_code == 200:
+      return render_to_response('linkedin_profile.html', {'response': response_dict})
+    else:
+      if r.has_key('reason'):
+        return HttpResponse('status was: ' + str(r.status_code) +
+                            ' and the reason is: ' + str(r.reason))
+      else:
+        return HttpResponse('something went wrong')
 

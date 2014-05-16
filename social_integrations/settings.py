@@ -9,6 +9,8 @@ TEMPLATE_DEBUG = DEBUG
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
+
+# Change to true to add LinkedIn Connections
 LINKEDIN_CONNECTIONS = False
 
 MANAGERS = ADMINS
@@ -110,6 +112,7 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.Loader',
 )
 
+# I added a middleware to deal with AuthCanceled exception.
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -148,14 +151,14 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
 )
 
+# Add social backends here
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-    'social.backends.linkedin.LinkedinOAuth',
     'social.backends.linkedin.LinkedinOAuth2',
-    'social.backends.google.GoogleOpenId',
     'social.backends.google.GoogleOAuth2',
 )
 
+# Add your own functions to this pipeline which will run after a user is authenticated
 SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.social_auth.social_details',
     'social.pipeline.social_auth.social_uid',
