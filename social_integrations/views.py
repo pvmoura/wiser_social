@@ -13,22 +13,32 @@ def home(request):
   """
   return render_to_response('home.html')
 
+def logout_user(request):
+  """ logout a user """
+  logout(request)
+  return redirect('/')
+
 def account(request):
+  """ simple account link """
   return render_to_response('profile.html')
+
 
 GOOGLE_API_URL = 'https://www.google.com/m8/feeds/contacts/default/full'
 
 def google_contact_info(request):
+  """ view to query google contact API """
 
   def get_domain(email):
+    """ returns an email's domain """
     return email[email.index('@') + 1:]
 
   if not request.user.is_authenticated():
     return redirect('/')
+
   try:
     token_obj = request.user.social_auth.get(provider='google-oauth2')
   except:
-    return HttpResponse('hello')
+    return redirect('/')
   
   token = token_obj.extra_data['access_token']
   domain = get_domain(token_obj.uid)
@@ -67,7 +77,6 @@ def google_contact_info(request):
         })
 
     return render_to_response('contacts.html', {'output': output})
-  return render_to_response('google.html', {'url': url})
 
 
 LINKEDIN_PROFILE_FIELDS = ('skills', 'first-name', 'last-name', 'positions')
@@ -80,14 +89,11 @@ def get_linkedin_request_resources(base, token, additions=None, format='json'):
     base += ':(' + ','.join(additions) + ')'
   return base, {'oauth2_access_token': token, 'format': format}
 
-def logout_user(request):
-  logout(request)
-  return redirect('/')
-
 def linkedin_profile_info (request):
   if request.user.is_authenticated():
-    token_obj = request.user.social_auth.get(provider='linkedin-oauth2')
-    if not token_obj:
+    try:
+      token_obj = request.user.social_auth.get(provider='linkedin-oauth2')
+    except:
       return redirect('/')
     token = token_obj.extra_data['access_token']
     url, params = get_linkedin_request_resources(

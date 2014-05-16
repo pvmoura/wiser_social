@@ -2,6 +2,8 @@
 
 ## Dependencies
 [Python-Social-Auth](https://github.com/omab/python-social-auth)
+
+
 [Requests](https://github.com/kennethreitz/requests)
 
 ## Overview
@@ -37,5 +39,12 @@ there.
 4. Create links in your app similar to those in home.html that will guide the user through the authentication process (facilitated by Python-Social-Auth)
 5. After authenticating, Python-Social-Auth executes the functions pointed to in settings.SOCIAL_AUTH_PIPELINE. This application uses Python-Social-Auth's default settings, but this is the place to put custom functions for saving to a custom user model. [The docs](http://psa.matiasaguirre.net/docs/pipeline.html)
 6. Query the APIs to get a user's information
-  * LinkedIn
-    
+  * [LinkedIn Profile API docs](https://developers.linkedin.com/documents/profile-api)
+    * LinkedIn allows you to add a number of extra [profile fields](https://developers.linkedin.com/documents/profile-fields)
+    * LinkedIn connections API [docs](https://developer.linkedin.com/documents/connections-api)
+  * [Google Contacts API docs](https://developers.google.com/google-apps/contacts/v3/#retrieving_all_contacts)
+    * Note: to get all of a user's contacts, set the query param 'max-results' to a large number (I set it to 50000)
+
+## Usage notes
+
+
